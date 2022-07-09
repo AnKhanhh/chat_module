@@ -8,6 +8,8 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.io.*;
 import java.net.Socket;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -18,13 +20,20 @@ public class Client extends JFrame {
 	static DataOutputStream dout;
 	static DataInputStream din;
 	static ObjectOutputStream oout;
+	static ArrayList<Packet> menu = new ArrayList<>();
+	static PacketHandler order = new PacketHandler();
 
-	String host = "localhost";
+	static {
+		menu.add(new Packet("apple", 10));
+		menu.add(new Packet("banana", 20));
+		menu.add(new Packet("cake", 30));
+	}
+
+	String host = "127.0.0.1";
 	int port = 4000, obj_port = 8000;
 	String nickname = "Client";
 	String oldmsg, msgout = "";
 	private String color = "#000000";
-
 	private JTextField c_msg;
 	private JTextPane c_area;
 	private JButton c_button;
@@ -46,7 +55,6 @@ public class Client extends JFrame {
 				"<li>arrow up to revert to revert to last message</li></ul><br/>");
 
 		c_button.addActionListener(new ActionListener() {
-
 			/**
 			 * Invoked when an action occurs.
 			 * @param e the event to be processed
@@ -90,6 +98,9 @@ public class Client extends JFrame {
 		}
 	}
 
+	public static void main(String[] args) {
+		Client client = new Client();
+	}
 
 	private void appendToPane(JTextPane tp, String msg) {
 		HTMLDocument doc = (HTMLDocument) tp.getDocument();
@@ -121,7 +132,7 @@ public class Client extends JFrame {
 		System.out.println("Wrong color format");
 	}
 
-	private void handleMsg(){
+	private void handleMsg() {
 		try {
 			msgout = c_msg.getText().trim();
 			oldmsg = msgout;
@@ -133,11 +144,14 @@ public class Client extends JFrame {
 				String temp = msgout.substring(1);
 				nickname = temp.replace(" ", "_");
 				return;
-			}else if (msgout.charAt(0) == '!' && Character.isDigit(msgout.charAt(1))) {
-				oout.writeObject(new Packet("banana", 10));
-				dout.writeUTF(msgout);
-				System.out.println(msgout.charAt(1));
-				appendToPane(c_area, "<span><i>an object has been sent to server</i></span>");
+			} else if (msgout.length() > 4 && msgout.substring(0, 5).equalsIgnoreCase("order")) {
+				String[] msgsplit = msgout.split("\\s+");
+				for (Packet p : menu) {
+					if (p.getName().equalsIgnoreCase(msgsplit[2])) {
+						order.change_bill(p, Integer.parseInt(msgsplit[1]));
+						System.out.println(order.getBill());
+					}
+				}
 				return;
 			} else if (msgout.charAt(0) == '#') {
 				changeColor(msgout);
@@ -148,9 +162,5 @@ public class Client extends JFrame {
 		} catch (IOException ex) {
 			System.out.println("exception in handling message");
 		}
-	}
-
-	public static void main(String[] args) {
-		Client client = new Client();
 	}
 }

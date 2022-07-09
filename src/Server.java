@@ -58,8 +58,6 @@ public class Server extends JFrame {
 			String msgin = "";
 			while(!msgin.equals("exit")){
 				msgin = din.readUTF();
-
-
 //				if (msgin.charAt(0)=='!'){
 //					try {
 //						Packet packet =(Packet) oin.readObject();

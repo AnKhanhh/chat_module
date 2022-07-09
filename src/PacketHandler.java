@@ -3,13 +3,17 @@ import java.util.HashMap;
 public class PacketHandler {
 	HashMap<String, Integer> bill = new HashMap<>();
 
+	public HashMap<String, Integer> getBill() {
+		return bill;
+	}
+
 	public void change_bill(Packet packet, Integer integer) {
-		if (integer <= 0) {
+		if (integer>0) {
 			bill.put(packet.getName(), integer);
 		} else bill.remove(packet.getName());
 	}
 
-	public void clear_bill(){
+	public void clear_bill() {
 		bill.clear();
 	}
 }
