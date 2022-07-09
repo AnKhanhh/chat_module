@@ -40,10 +40,9 @@ public class Client extends JFrame {
 		this.setVisible(true);
 
 		c_area.setContentType("text/html");
-		appendToPane(c_area,"<h1>list of commands:</h1><ul>" +
-				"<li><b>@name</b> to change your name</li>"+
-				"<li><b>#00ffff</b> to change color of your name</li>"+
-				"<li><b>!1</b> or <b>!2</b> to test object stream</li>"+
+		appendToPane(c_area, "<h1>list of commands:</h1><ul>" +
+				"<li><b>@name</b> to change your name</li>" +
+				"<li><b>#00ffff</b> to change color of your name</li>" +
 				"<li>arrow up to revert to revert to last message</li></ul><br/>");
 
 		c_button.addActionListener(new ActionListener() {
@@ -54,31 +53,7 @@ public class Client extends JFrame {
 			 */
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				try {
-					msgout = c_msg.getText().trim();
-					oldmsg = msgout;
-					c_msg.requestFocus();
-					c_msg.setText(null);
-					if (msgout.equals("")) return;
-					else if (msgout.charAt(0) == '@') {
-						String temp = msgout.substring(1);
-						nickname = temp.replace(" ", "_");
-						return;
-					} else if (msgout.charAt(0) == '!' && Character.isDigit(msgout.charAt(1))) {
-						oout.writeObject(new Packet(Character.getNumericValue(msgout.charAt(1))));
-						dout.writeUTF(msgout);
-						System.out.println(msgout.charAt(1));
-						appendToPane(c_area, "<span><i>an object has been sent to server</i></span>");
-						return;
-					} else if (msgout.charAt(0) == '#') {
-						changeColor(msgout);
-						return;
-					}
-					appendToPane(c_area, "<span><b style='color: " + color + "'>" + nickname + ": </b>" + msgout + "</span>");
-					dout.writeUTF(msgout);
-				} catch (IOException ex) {
-					ex.printStackTrace();
-				}
+				handleMsg();
 			}
 		});
 
@@ -90,17 +65,7 @@ public class Client extends JFrame {
 			@Override
 			public void keyPressed(KeyEvent e) {
 				if (e.getKeyCode() == KeyEvent.VK_ENTER) {
-					try {
-						msgout = c_msg.getText().trim();
-						oldmsg = msgout;
-						c_msg.requestFocus();
-						c_msg.setText(null);
-						if (msgout.equals("")) return;
-						appendToPane(c_area, "<span><b style='color: " + color + "'>" + nickname + ": </b>" + msgout + "</span>");
-						dout.writeUTF(msgout);
-					} catch (IOException ex) {
-						ex.printStackTrace();
-					}
+					handleMsg();
 				} else if (e.getKeyCode() == KeyEvent.VK_UP) {
 					String current_msg = c_msg.getText().trim();
 					c_msg.setText(oldmsg);
@@ -125,9 +90,6 @@ public class Client extends JFrame {
 		}
 	}
 
-	public static void main(String[] args) {
-		Client client = new Client();
-	}
 
 	private void appendToPane(JTextPane tp, String msg) {
 		HTMLDocument doc = (HTMLDocument) tp.getDocument();
@@ -140,7 +102,7 @@ public class Client extends JFrame {
 		}
 	}
 
-	public void changeColor(String hexColor) {
+	private void changeColor(String hexColor) {
 		// validate string
 		Pattern colorPattern = Pattern.compile("#([0-9a-f]{3}|[0-9a-f]{6}|[0-9a-f]{8})");
 		Matcher m = colorPattern.matcher(hexColor);
@@ -157,5 +119,38 @@ public class Client extends JFrame {
 			return;
 		}
 		System.out.println("Wrong color format");
+	}
+
+	private void handleMsg(){
+		try {
+			msgout = c_msg.getText().trim();
+			oldmsg = msgout;
+			c_msg.requestFocus();
+			c_msg.setText(null);
+			if (msgout.equals("")) {
+				return;
+			} else if (msgout.charAt(0) == '@') {
+				String temp = msgout.substring(1);
+				nickname = temp.replace(" ", "_");
+				return;
+			}else if (msgout.charAt(0) == '!' && Character.isDigit(msgout.charAt(1))) {
+				oout.writeObject(new Packet("banana", 10));
+				dout.writeUTF(msgout);
+				System.out.println(msgout.charAt(1));
+				appendToPane(c_area, "<span><i>an object has been sent to server</i></span>");
+				return;
+			} else if (msgout.charAt(0) == '#') {
+				changeColor(msgout);
+				return;
+			}
+			appendToPane(c_area, "<span><b style='color: " + color + "'>" + nickname + ": </b>" + msgout + "</span>");
+			dout.writeUTF(msgout);
+		} catch (IOException ex) {
+			ex.printStackTrace();
+		}
+	}
+
+	public static void main(String[] args) {
+		Client client = new Client();
 	}
 }

@@ -1,17 +1,19 @@
 import java.io.Serializable;
 
 public class Packet implements Serializable {
-	String food;
+	String name;
+	int price;
 
-	public Packet(int i){
-		switch (i) {
-			case 1 -> food = "apple";
-			case 2 -> food = "banana";
-			default -> food = "not_supported";
-		}
+	public Packet(String name, int price) {
+		this.name = name;
+		this.price = price;
 	}
 
-	public String getPacket() {
-		return food;
+	public String getName() {
+		return name;
+	}
+
+	public int getPrice() {
+		return price;
 	}
 }

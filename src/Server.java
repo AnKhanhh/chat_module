@@ -58,15 +58,17 @@ public class Server extends JFrame {
 			String msgin = "";
 			while(!msgin.equals("exit")){
 				msgin = din.readUTF();
-				if (msgin.charAt(0)=='!'){
-					try {
-						Packet packet =(Packet) oin.readObject();
-						appendToPane(s_area, "<span>Object received: <i>"+packet.getPacket()+"</i></span>");
-						continue;
-					} catch (ClassNotFoundException e) {
-						e.printStackTrace();
-					}
-				}
+
+
+//				if (msgin.charAt(0)=='!'){
+//					try {
+//						Packet packet =(Packet) oin.readObject();
+//						appendToPane(s_area, "<span>Object received: <i>"+packet.getPacket()+"</i></span>");
+//						continue;
+//					} catch (ClassNotFoundException e) {
+//						e.printStackTrace();
+//					}
+//				}
 				appendToPane(s_area,"<span>client: "+msgin+"</span>");
 			}
 		} catch (IOException e) {
