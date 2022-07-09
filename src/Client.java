@@ -146,7 +146,7 @@ public class Client extends JFrame {
 			appendToPane(c_area, "<span><b style='color: " + color + "'>" + nickname + ": </b>" + msgout + "</span>");
 			dout.writeUTF(msgout);
 		} catch (IOException ex) {
-			ex.printStackTrace();
+			System.out.println("exception in handling message");
 		}
 	}
 
