@@ -10,6 +10,7 @@ import java.io.*;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -39,16 +40,21 @@ public class Client extends JFrame {
 	private JButton c_button;
 	private JPanel mainpn;
 	private JScrollPane c_scroll;
+	private JButton c_clear;
+	private JTextPane c_b_area;
+	private JScrollPane c_b_scroll;
 
 	public Client() {
 		super("client");
 		this.setDefaultCloseOperation(EXIT_ON_CLOSE);
 		this.setContentPane(mainpn);
 		this.c_area.setEditable(false);
+		this.c_b_area.setEditable(false);
 		this.pack();
 		this.setVisible(true);
 
 		c_area.setContentType("text/html");
+		c_b_area.setContentType("text/html");
 		appendToPane(c_area, "<h1>list of commands:</h1><ul>" +
 				"<li><b>@name</b> to change your name</li>" +
 				"<li><b>#00ffff</b> to change color of your name</li>" +
@@ -62,6 +68,19 @@ public class Client extends JFrame {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				handleMsg();
+			}
+		});
+
+		c_clear.addActionListener(new ActionListener() {
+			/**
+			 * Invoked when an action occurs.
+			 * @param e the event to be processed
+			 */
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				order.clear_bill();
+				renderBill();
+				System.out.println(order.getBill());
 			}
 		});
 
@@ -152,6 +171,12 @@ public class Client extends JFrame {
 						System.out.println(order.getBill());
 					}
 				}
+				renderBill();
+				return;
+			} else if (msgout.equalsIgnoreCase("!confirm")) {
+				System.out.println("order sent");
+				oout.writeObject(order);
+				dout.writeUTF(msgout);
 				return;
 			} else if (msgout.charAt(0) == '#') {
 				changeColor(msgout);
@@ -160,7 +185,19 @@ public class Client extends JFrame {
 			appendToPane(c_area, "<span><b style='color: " + color + "'>" + nickname + ": </b>" + msgout + "</span>");
 			dout.writeUTF(msgout);
 		} catch (IOException ex) {
-			System.out.println("exception in handling message");
+			ex.printStackTrace();
 		}
+	}
+
+	private void renderBill() {
+		c_b_area.setText(null);
+		StringBuilder render = new StringBuilder("You ordered:<br/><ul>");
+		for (Map.Entry<String, Integer> entry : order.getBill().entrySet()) {
+			String food = entry.getKey();
+			String amount = entry.getValue().toString();
+			render.append("<li>").append(amount).append(" ").append(food).append("</li>");
+		}
+		render.append("</ul>");
+		appendToPane(c_b_area, render.toString());
 	}
 }

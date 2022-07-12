@@ -1,6 +1,7 @@
+import java.io.Serializable;
 import java.util.HashMap;
 
-public class PacketHandler {
+public class PacketHandler implements Serializable {
 	HashMap<String, Integer> bill = new HashMap<>();
 
 	public HashMap<String, Integer> getBill() {
