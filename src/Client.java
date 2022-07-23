@@ -108,12 +108,23 @@ public class Client extends JFrame {
 			dout = new DataOutputStream(s.getOutputStream());
 			oout = new ObjectOutputStream(obj_s.getOutputStream());
 			String msgin = "";
-			while (!msgin.equals("exit")) {
+			while (!msgin.equals("quit")) {
 				msgin = din.readUTF();
 				appendToPane(c_area, "<span><b>Server: </b>" + msgin + "</span>");
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
+		} finally {
+			try {
+				din.close();
+				dout.close();
+				oout.close();
+				obj_s.close();
+				s.close();
+				System.out.println("Connection closed successfully");
+			} catch (IOException e) {
+				System.out.println("Error when closing");
+			}
 		}
 	}
 
